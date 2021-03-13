@@ -3,6 +3,8 @@ package randoop.generation;
 import randoop.operation.TypedOperation;
 import randoop.sequence.Sequence;
 
+import java.util.List;
+
 /**
  * An interface for selecting an operation for the {@link ForwardGenerator} to use in constructing a
  * new test sequence.
@@ -22,4 +24,6 @@ public interface TypedOperationSelector {
    * @param sequence newly created sequence that was classified as a regression test
    */
   public abstract void newRegressionTestHook(Sequence sequence);
+
+  public List<TypedOperation> getOperations();
 }

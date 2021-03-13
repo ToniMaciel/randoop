@@ -42,4 +42,9 @@ public class UniformRandomMethodSelection implements TypedOperationSelector {
    */
   @Override
   public void newRegressionTestHook(Sequence sequence) {}
+
+  @Override
+  public List<TypedOperation> getOperations(){
+    return this.operations;
+  }
 }

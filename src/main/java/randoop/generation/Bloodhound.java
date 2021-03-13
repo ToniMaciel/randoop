@@ -370,4 +370,9 @@ public class Bloodhound implements TypedOperationSelector {
   public void newRegressionTestHook(Sequence sequence) {
     incrementSuccessfulInvocationCount(sequence.getOperation());
   }
+
+    @Override
+    public List<TypedOperation> getOperations(){
+        return this.operationSimpleList;
+    }
 }
