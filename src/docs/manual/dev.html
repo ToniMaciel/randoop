@@ -46,7 +46,10 @@
       <li><a href="#modmanual">Modifying the manual</a></li>
       <li><a href="#github-site">Modifying the website</a></li>
     </ul></li>
-  <li><a href="#making_new_dist">Releasing a new version of Randoop</a></li>
+  <li><a href="#making_new_dist">Releasing a new version of Randoop</a>
+    <ul>
+      <li><a href="#publish_maven">Publishing artifacts to Maven repositories</a></li>
+    </ul></li>
   <li><a href="#randoop_internals">Randoop internals</a>
     <ul>
       <li><a href="#unit_tests">Unit test concepts</a></li>
@@ -104,25 +107,7 @@
 <p>
   To install prerequisites, execute (as superuser) the RUN commands in files
   named <code>scripts/Dockerfile-<em>OPERATINGSYSTEM</em>-jdkany</code>.
-  For example, to install prerequisites on Ubuntu, run
 </p>
-<!-- Accurate as of July 2017 -->
-  <pre>
-    sudo apt-get -qqy install git gradle default-jdk
-    sudo apt-get -qqy install perl python-pip
-    sudo pip install html5validator
-  </pre>
-
-<p>
-  If you do not have superuser permissions, ask your system administrator
-  to install the software.  You can run the last command yourself, by changing it to
-  <code>pip install --user html5validator</code>.
-</p>
-
-<!--
-Unfortunately, gradle seems to require that html5validator is on the path, even if
-you will never run a task that calls html5validator.
--->
 
 
 <h1 id="compiling">Building Randoop</h1>
@@ -299,7 +284,7 @@ the <code>build/libs</code> subdirectory of both the Randoop project and the
 agent project directories.
 So, for instance, the following will work to run the <code>covered-class</code> agent:
 </p>
-<pre><code>-javaagent:&lt;randoop-path&gt;/build/libs/covered-class-4.2.4.jar</code></pre>
+<pre><code>-javaagent:&lt;randoop-path&gt;/build/libs/covered-class-4.2.5.jar</code></pre>
 
 
 
@@ -365,7 +350,7 @@ java -cp .:junit-4.11.jar:.../randoop/build/classes/java/testInput/ org.junit.ru
 
 You can minimize the test with a command like this:
 <pre>
-java -ea -cp randoop-all-4.2.4.jar randoop.main.Main minimize \
+java -ea -cp randoop-all-4.2.5.jar randoop.main.Main minimize \
   --suitepath=ErrorTest0.java --suiteclasspath=.:junit-4.11.jar:.../randoop/classes/java/testInput/
 </pre>
 
@@ -763,9 +748,9 @@ task described below.
       Set environment variables for the old and new version numbers.
       (Don't necessarily use the examples given here!)
       <pre>
-OLDVERSION=<em>4.2.4</em>
-NEWVERSION=<em>4.2.5</em>
-NEXTVERSION=<em>4.2.6</em></pre>
+OLDVERSION=<em>4.2.5</em>
+NEWVERSION=<em>4.2.6</em>
+NEXTVERSION=<em>4.2.7</em></pre>
     </li>
     <li>Update the version number by running the following commands.
 <pre>
@@ -774,17 +759,13 @@ NEXTVERSION=<em>4.2.6</em></pre>
   (cd src && preplace `echo $NEWVERSION | sed 's/\./\\\./g'` $NEXTVERSION)
   (cd src && preplace `echo $OLDVERSION | sed 's/\./\\\./g'` $NEWVERSION)
 </pre>
-    Undo undesirable changes to version numbers
-    in <code>src/docs/CHANGES.txt</code>.<br/>
-    Update OLDVERSION, NEWVERSION, and NEXTVERSION for <em>next</em> release in <code>src/docs/manual/dev.html</code>.<br/>
-    Update the date in <code>src/docs/manual/index.html</code>;
-    double-check against <code>docs/CHANGES.txt</code>.<br/>
-    Double-check all uncommitted changes.<br/>
-    Stage the changes, but don't commit the changes yet.
-
-    <br/>TODO: Maybe try committing, to see if repository is corrupted.
-    I'm seeing repository corruption in a later step, but I don't know why.
-
+      Undo undesirable changes to version numbers
+      in <code>src/docs/CHANGES.txt</code>.<br/>
+      Update OLDVERSION, NEWVERSION, and NEXTVERSION for <em>next</em> release in <code>src/docs/manual/dev.html</code>.<br/>
+      Update the date in <code>src/docs/manual/index.html</code>;
+      double-check against <code>docs/CHANGES.txt</code>.<br/>
+      Double-check all uncommitted changes.<br/>
+      Stage the changes, but don't commit the changes yet.
     </li>
     <li>Change the three exceptions for the Randoop zip file
       in <a href="https://github.com/plume-lib/checklink/blob/master/checklink-args.txt">checklink-args.txt</a>,
@@ -793,20 +774,21 @@ NEXTVERSION=<em>4.2.6</em></pre>
     </li>
   </ol>
 </li>
-<li>Create the distribution files, commit, and push.  This takes
-  a while because it runs all the tests.  It also updates the project site in
-  the <code>gh-pages</code> branch.
-  <!-- I had a problem where this only succeeded if I ran the first gradle command on its own.
-    I'm not sure why.  If it persists, update the instructions. -->
-<pre>
-  ((./gradlew clean buildRelease && \
-  git commit . -m "Update version to $NEWVERSION" && git push && \
-  echo "Successful buildRelease") || (echo "Failed buildRelease" && false)) && \
-  ((cd ../randoop-branch-gh-pages && \
-  git add -A . && git commit . -m "Update version to $NEWVERSION" && git push && \
-  echo "Successful gh-pages; proceed with release") || (echo "Failed gh-pages" && false))
-</pre>
+<li>Create the distribution files.
   This runs the tests again, so it takes about half an hour.
+<!-- Combining this command with the next one seems to fail.  I don't know why. -->
+<pre>
+  ./gradlew clean buildRelease
+</pre>
+</li>
+<li>
+  Commit the changes and update the project site in
+  the <code>gh-pages</code> branch:
+<pre>
+  git commit . -m "Update version to $NEWVERSION" && git push && \
+  (cd ../randoop-branch-gh-pages && \
+  git add -A . && git commit . -m "Update version to $NEWVERSION" && git push)
+</pre>
   </li>
   <li>
     Check that there are no broken links on the published website:
@@ -833,12 +815,12 @@ NEXTVERSION=<em>4.2.6</em></pre>
     <!-- The gh-pages branch is not tagged. -->
   </li>
   <li>Follow the
-    <a href="https://docs.github.com/en/github/administering-a-repository/managing-releases-in-a-repository">GitHub instructions for creating a release</a>;
+    <a href="https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/managing-releases-in-a-repository">GitHub instructions for creating a release</a>;
     in particular, start at
     <a href="https://github.com/randoop/randoop/releases">https://github.com/randoop/randoop/releases</a>,
     click "Draft a new release",
-    in the "Tag" text field, choose v<em>4.2.5</em>,
-    name it "Randoop version <em>4.2.5</em>",
+    in the "Tag" text field, choose v<em>4.2.6</em>,
+    name it "Randoop version <em>4.2.6</em>",
     use the changelog entry as the description (but remove any line breaks,
     change to Markdown,  and check the preview),
     upload the the zip file from <code>build/distributions</code>,
@@ -847,9 +829,9 @@ NEXTVERSION=<em>4.2.6</em></pre>
   </li>
   <li>Email an announcement to randoop-discuss@googlegroups.com
     <br/>
-    Subject: Randoop version <em>4.2.5</em>
+    Subject: Randoop version <em>4.2.6</em>
     <br/>
-    Randoop <em>4.2.5</em> has been released and is available at
+    Randoop <em>4.2.6</em> has been released and is available at
     https://github.com/randoop/randoop/releases/latest.  The changelog appears below.
   </li>
   <li>Make pull requests against downstream projects that use Randoop.  In each, search for the old version number.
@@ -860,6 +842,27 @@ NEXTVERSION=<em>4.2.6</em></pre>
     </ul>
   </li>
 </ol>
+
+
+<h2 id="publish_maven">Publishing artifacts to Maven repositories</h2>
+
+<p>
+To publish jars to Maven repositories:
+</p>
+
+<ul>
+  <li>
+    <code>./gradlew publishLocalPublicationToMavenLocal</code>
+    publishes the artifacts to the local Maven repository.
+  </li>
+  <li>
+    <code>./gradlew publishRemotePublicationToMavenRepository -PSONATYPE_NEXUS_USERNAME=username -PSONATYPE_NEXUS_PASSWORD=password</code>
+    publishes the artifacts to the Nexus repository.  If the version number ends in <code>SNAPSHOT</code>, the release is published as a snapshot and no signing is required.
+  </li>
+  <li>
+    If this is not a SNAPSHOT release, then add <code>-Psigning.secretKeyRingFile=file -Psigning.password=secret -Psigning.keyId=id</code> to the command.
+  </li>
+</ul>
 
 
 <h1 id="randoop_internals">Randoop internals</h1>

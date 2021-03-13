@@ -13,7 +13,6 @@ import java.io.Writer;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -505,7 +504,7 @@ public class OperationModel {
    */
   public void logOperations(Writer out) {
     try {
-      out.write("Operations: " + Globals.lineSep);
+      out.write("Operations: (" + operations.size() + ")" + Globals.lineSep);
       for (TypedOperation t : operations) {
         out.write("  " + t.toString());
         out.write(Globals.lineSep);
@@ -546,7 +545,11 @@ public class OperationModel {
       out.write(String.format("  classLiteralMap = %s%n", classLiteralMap));
       out.write(String.format("  annotatedTestValues = %s%n", annotatedTestValues));
       out.write(String.format("  contracts = %s%n", contracts));
-      out.write(String.format("  omitMethods = %s%n", omitMethods));
+      out.write(String.format("  omitMethods = [%n"));
+      for (Pattern p : omitMethods) {
+        out.write(String.format("    %s%n", p));
+      }
+      out.write(String.format("  ]%n"));
       // Use logOperations instead: out.write(String.format("  operations = %s%n", operations));
       logOperations(out);
     } catch (IOException ioe) {
@@ -600,11 +603,10 @@ public class OperationModel {
       }
       // Note that c could be null if errorHandler just warns on bad names
       if (c != null) {
-        String discardReason = nonInstantiable(c, visibility);
-        if (discardReason != null) {
+        if (!visibility.isVisible(c)) {
           System.out.printf(
-              "Cannot instantiate %s %s specified via --testclass or --classlist.%n",
-              discardReason, c.getName());
+              "Cannot instantiate non-visible %s specified via --testclass or --classlist.%n",
+              c.getName());
         } else {
           try {
             mgr.apply(c);
@@ -633,25 +635,6 @@ public class OperationModel {
       if (c != null && !c.isInterface()) {
         coveredClassesGoal.add(c);
       }
-    }
-  }
-
-  /**
-   * Is this type instantiable? It must be visible, non-abstract, and not an interface.
-   *
-   * @param c the type to test for instantiability
-   * @param visibility the visibility predicate
-   * @return null if this class is instantiable to test, otherwise a string with a discard reason
-   */
-  public static String nonInstantiable(Class<?> c, VisibilityPredicate visibility) {
-    if (c.isInterface()) {
-      return "interface";
-    } else if (!visibility.isVisible(c)) {
-      return "non-visible";
-    } else if (Modifier.isAbstract(c.getModifiers()) && !c.isEnum()) {
-      return "abstract";
-    } else {
-      return null;
     }
   }
 

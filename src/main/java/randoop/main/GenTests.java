@@ -38,6 +38,7 @@ import org.checkerframework.checker.signature.qual.Identifier;
 import org.plumelib.options.Options;
 import org.plumelib.options.Options.ArgException;
 import org.plumelib.util.EntryReader;
+import org.plumelib.util.StringsPlume;
 import org.plumelib.util.UtilPlume;
 import randoop.ExecutionVisitor;
 import randoop.Globals;
@@ -275,9 +276,11 @@ public class GenTests extends GenInputsAbstract {
       omit_methods.addAll(readPatternsFromResource("/JDK-nondet-methods.txt"));
     }
 
-    String omitClassesDefaultsFileName = "/omit-classes-defaults.txt";
-    InputStream inputStream = GenTests.class.getResourceAsStream(omitClassesDefaultsFileName);
-    omit_classes.addAll(readPatterns(inputStream, omitClassesDefaultsFileName));
+    if (!GenInputsAbstract.omit_classes_no_defaults) {
+      String omitClassesDefaultsFileName = "/omit-classes-defaults.txt";
+      InputStream inputStream = GenTests.class.getResourceAsStream(omitClassesDefaultsFileName);
+      omit_classes.addAll(readPatterns(inputStream, omitClassesDefaultsFileName));
+    }
 
     ReflectionPredicate reflectionPredicate = new DefaultReflectionPredicate(omitFields);
 
@@ -345,7 +348,17 @@ public class GenTests extends GenInputsAbstract {
         }
         System.out.println("Correct your classpath or the class name and re-run Randoop.");
       } else {
-        e.printStackTrace();
+        System.out.println("Problem in OperationModel.createModel().");
+        System.out.println("  visibility = " + visibility);
+        System.out.println("  reflectionPredicate = " + reflectionPredicate);
+        System.out.println("  omit_methods = " + omit_methods);
+        System.out.println("  classnames = " + classnames);
+        System.out.println("  coveredClassnames = " + coveredClassnames);
+        System.out.println("  classNameErrorHandler = " + classNameErrorHandler);
+        System.out.println(
+            "  GenInputsAbstract.literals_file = " + GenInputsAbstract.literals_file);
+        System.out.println("  operationSpecifications = " + operationSpecifications);
+        e.printStackTrace(System.out);
       }
       System.exit(1);
     } catch (RandoopSpecificationError e) {
@@ -568,8 +581,7 @@ public class GenTests extends GenInputsAbstract {
           GenInputsAbstract.regression_test_basename,
           "Regression");
 
-      // TODO: cxing handle Error Test Sequence tallying.
-      //  Currently, we don't rerun Error Test Sequences, so we do not know whether they are flaky.
+      // TODO: We don't rerun Error Test Sequences, so we do not know whether they are flaky.
       if (GenInputsAbstract.progressdisplay) {
         System.out.printf("About to look for flaky methods.%n");
       }
@@ -588,7 +600,8 @@ public class GenTests extends GenInputsAbstract {
     if (this.sequenceCompileFailureCount > 0) {
       System.out.printf(
           "%nUncompilable sequences generated (count: %d).%n", this.sequenceCompileFailureCount);
-      System.out.println("Please report at https://github.com/randoop/randoop/issues ,");
+      System.out.println(
+          "Please report uncompilable sequences at https://github.com/randoop/randoop/issues ,");
       System.out.println(
           "providing the information requested at https://randoop.github.io/randoop/manual/index.html#bug-reporting .");
     }
@@ -635,8 +648,8 @@ public class GenTests extends GenInputsAbstract {
   public static final String POSSIBLY_FLAKY_PREFIX = "  Possibly flaky:  ";
 
   /**
-   * Outputs suspected flaky methods by using the tf-idf metric (Term Frequency - Inverse Document
-   * Frequency), which is:
+   * Outputs names of suspected flaky methods by using the tf-idf metric (Term Frequency - Inverse
+   * Document Frequency), which is:
    *
    * <pre>(number of flaky tests M occurs in) / (number of total tests M occurs in)</pre>
    *
@@ -808,7 +821,7 @@ public class GenTests extends GenInputsAbstract {
       }
       abspaths[i] = abs;
     }
-    return UtilPlume.join(File.pathSeparator, abspaths);
+    return StringsPlume.join(File.pathSeparator, abspaths);
   }
 
   /**
@@ -1249,7 +1262,7 @@ public class GenTests extends GenInputsAbstract {
     }
 
     try {
-      return UtilPlume.fileLines(filename);
+      return Files.readAllLines(Paths.get(filename));
     } catch (IOException e) {
       System.err.println("Unable to read " + filename);
       System.exit(1);
