@@ -243,6 +243,20 @@ public abstract class AbstractGenerator {
         || (listenerMgr != null && listenerMgr.shouldStopGeneration());
   }
 
+  public boolean hasSequenceMandatoryMethodOperations(){
+    if (this.mandatoryMethodList.size() > 0) {
+      for (Sequence sequence : this.getAllSequences()) {
+        for (TypedOperation typedOperation : this.mandatoryMethodList) {
+          if (sequence.getOperation().equals(typedOperation)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    return true;
+  }
+
   /**
    * Attempt to generate a test (a sequence).
    *
@@ -266,6 +280,8 @@ public abstract class AbstractGenerator {
    */
   public abstract int numGeneratedSequences();
 
+  public abstract ExecutableSequence stepTargetMethod();
+
   /**
    * Returns the count of generated sequence currently for output.
    *
@@ -275,6 +291,8 @@ public abstract class AbstractGenerator {
     return outErrorSeqs.size() + outRegressionSeqs.size();
   }
 
+  public Set<TypedOperation> mandatoryMethodList;
+
   /**
    * Returns the count of generated error-revealing sequences.
    *
@@ -282,6 +300,68 @@ public abstract class AbstractGenerator {
    */
   private int numErrorSequences() {
     return outErrorSeqs.size();
+  }
+
+  public void addTargetMethod(){
+    if (listenerMgr != null) {
+      listenerMgr.generationStepPre();
+    }
+
+    num_steps++;
+
+    ExecutableSequence eSeq = stepTargetMethod();
+
+    if (dump_sequences) {
+      Log.logPrintf("%nseq before run:%n%s%n", eSeq);
+    }
+
+    // Notify listeners we just completed generation step.
+    if (listenerMgr != null) {
+      listenerMgr.generationStepPost(eSeq);
+    }
+
+    if (GenInputsAbstract.progressdisplay
+            && GenInputsAbstract.progressintervalsteps != -1
+            && num_steps % GenInputsAbstract.progressintervalsteps == 0) {
+      progressDisplay.display(!GenInputsAbstract.deterministic);
+    }
+
+    if (eSeq == null) {
+      null_steps++;
+    }else {
+
+      num_sequences_generated++;
+
+      boolean test;
+      try {
+        test = outputTest.test(eSeq);
+      } catch (Throwable t) {
+        System.out.printf(
+                "%nProblem with sequence:%n%s%n%s%n", eSeq, UtilPlume.stackTraceToString(t));
+        throw t;
+      }
+      if (test) {
+        // Classify the sequence
+        if (eSeq.hasInvalidBehavior()) {
+          invalidSequenceCount++;
+        } else if (eSeq.hasFailure()) {
+          operationHistory.add(eSeq.getOperation(), OperationOutcome.ERROR_SEQUENCE);
+          num_failing_sequences++;
+          outErrorSeqs.add(eSeq);
+        } else {
+          outRegressionSeqs.add(eSeq);
+          newRegressionTestHook(eSeq.sequence);
+        }
+      } else {
+        num_failed_output_test++;
+      }
+
+      if (dump_sequences) {
+        Log.logPrintf("Sequence after execution:%n%s%n", eSeq);
+        Log.logPrintf("allSequences.size()=%s%n", numGeneratedSequences());
+        // componentManager.log();
+      }
+    }
   }
 
   /**
@@ -369,7 +449,9 @@ public abstract class AbstractGenerator {
         Log.logPrintf("allSequences.size()=%s%n", numGeneratedSequences());
         // componentManager.log();
       }
+      if (num_sequences_generated%50 == 0) addTargetMethod();
     }
+//    addTargetMethod();
 
     if (GenInputsAbstract.progressdisplay && progressDisplay != null) {
       progressDisplay.display(!GenInputsAbstract.deterministic);
