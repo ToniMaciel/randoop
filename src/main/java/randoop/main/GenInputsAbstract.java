@@ -336,6 +336,9 @@ public abstract class GenInputsAbstract extends CommandHandler {
   @Option("File containing class names that tests must cover")
   public static Path require_covered_classes = null;
 
+  @Option("File containing class names that tests may have their values changed")
+  public static Path set_operation_classes = null;
+
   /**
    * If true, Randoop outputs both original error-revealing tests and a minimized version. Setting
    * this option may cause long Randoop run times if Randoop outputs and minimizes more than about

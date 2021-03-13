@@ -101,6 +101,8 @@ public class OperationModel {
   /** User-supplied predicate for methods that should not be used during test generation. */
   private OmitMethodsPredicate omitMethodsPredicate;
 
+  //private Set<TypedOperation> mandatoryMethodList;
+
   /** Create an empty model of test context. */
   private OperationModel() {
     // TreeSet here for deterministic coverage in the systemTest runNaiveCollectionsTest()
@@ -124,6 +126,7 @@ public class OperationModel {
 
     coveredClassesGoal = new LinkedHashSet<>();
     operations = new TreeSet<>();
+    //mandatoryMethodList = new TreeSet<>();
   }
 
   /**
@@ -159,7 +162,12 @@ public class OperationModel {
 
     // for debugging only
     model.omitMethods = omitMethods;
-
+    model.omitMethodsPredicate = new OmitMethodsPredicate(omitMethods);
+    model.addOperationsUsingSignatures(
+            GenInputsAbstract.methodlist, visibility, reflectionPredicate);
+    findClasses(classnames, model.operations);
+    //com base nos métodos, fazer o cálculo das classes...
+    //um método, que altera esse parâmetro classnames
     model.addClassTypes(
         visibility,
         reflectionPredicate,
@@ -168,14 +176,22 @@ public class OperationModel {
         errorHandler,
         literalsFileList);
 
-    model.omitMethodsPredicate = new OmitMethodsPredicate(omitMethods);
 
     model.addOperationsFromClasses(visibility, reflectionPredicate, operationSpecifications);
-    model.addOperationsUsingSignatures(
-        GenInputsAbstract.methodlist, visibility, reflectionPredicate);
+    //model.addOperationsRelatedToMandatoryMethods(GenInputsAbstract.methodlist, visibility, reflectionPredicate);
     model.addObjectConstructor();
 
     return model;
+  }
+
+  public static void findClasses(Set<@ClassGetName String> classnames, Set<TypedOperation> currentOperations){
+      for(TypedOperation typedOperation: currentOperations){
+        for(Type type: typedOperation.getInputTypes()){
+          if (!classnames.contains(type.getRuntimeClass().getName())) {
+            classnames.add(type.getRuntimeClass().getName());
+          }
+        }
+      }
   }
 
   /**
@@ -552,6 +568,7 @@ public class OperationModel {
    *     heuristic
    * @param errorHandler the handler for bad class names
    * @param literalsFileList the list of literals file names
+   * Receber a informação do target method aqui.
    */
   private void addClassTypes(
       VisibilityPredicate visibility,
