@@ -54,6 +54,7 @@ import randoop.sequence.Sequence;
 import randoop.test.ContractSet;
 import randoop.types.ClassOrInterfaceType;
 import randoop.types.Type;
+import randoop.types.TypeTuple;
 import randoop.util.Log;
 import randoop.util.MultiMap;
 
@@ -161,26 +162,55 @@ public class OperationModel {
 
     // for debugging only
     model.omitMethods = omitMethods;
+    model.addOperationsRelatedToMandatoryMethods(GenInputsAbstract.methodlist, visibility, reflectionPredicate, classnames);
+    model.addClassTypes(visibility, reflectionPredicate, classnames, coveredClassesGoalNames, errorHandler, literalsFileList);
     model.omitMethodsPredicate = new OmitMethodsPredicate(omitMethods);
+    model.addOperationsFromClasses(visibility, reflectionPredicate, operationSpecifications);
     model.addOperationsUsingSignatures(
             GenInputsAbstract.methodlist, visibility, reflectionPredicate);
     findClasses(classnames, model.operations);
     //com base nos métodos, fazer o cálculo das classes...
     //um método, que altera esse parâmetro classnames
-    model.addClassTypes(
-        visibility,
-        reflectionPredicate,
-        classnames,
-        coveredClassesGoalNames,
-        errorHandler,
-        literalsFileList);
 
 
-    model.addOperationsFromClasses(visibility, reflectionPredicate, operationSpecifications);
-    //model.addOperationsRelatedToMandatoryMethods(GenInputsAbstract.methodlist, visibility, reflectionPredicate);
-    model.addObjectConstructor();
+    //model.addOperationsFromClasses(visibility, reflectionPredicate, operationSpecifications);
+
+    //model.addObjectConstructor();
 
     return model;
+  }
+
+  private void addOperationsRelatedToMandatoryMethods(Path method_list, VisibilityPredicate visibility,
+      ReflectionPredicate reflectionPredicate, Set<@ClassGetName String> classnames) throws SignatureParseException {
+    if (method_list == null) {
+      return;
+    }
+    try (EntryReader reader = new EntryReader(method_list, "(//|#).*$", null)) {
+      for (String line : reader) {
+        String sig = line.trim();
+        if (!sig.isEmpty()) {
+          try {
+            TypedClassOperation operation =
+                signatureToOperation(sig, visibility, reflectionPredicate);
+            for(Type typeInput: operation.getInputTypes()){
+                if(!typeInput.isPrimitive()) {
+                  classTypes.add(ClassOrInterfaceType.forClass(typeInput.getRuntimeClass()));
+                  classnames.add(typeInput.getRuntimeClass().getName());
+                }
+            }
+            if(!operation.getOutputType().isPrimitive()){
+              classTypes.add(ClassOrInterfaceType.forClass(operation.getOutputType().getRuntimeClass()));
+              classnames.add(operation.getOutputType().getRuntimeClass().getName());
+            }
+          } catch (FailedPredicateException e) {
+            System.out.printf("Ignoring %s that failed predicate: %s%n", sig, e.getMessage());
+          }
+        }
+      }
+    } catch (IOException e) {
+      throw new RandoopUsageError("Problem reading file " + method_list, e);
+    }
+
   }
 
   public static void findClasses(Set<@ClassGetName String> classnames, Set<TypedOperation> currentOperations){
@@ -621,7 +651,10 @@ public class OperationModel {
     }
     if (GenInputsAbstract.progressdisplay) {
       if (succeeded == classnames.size()) {
-        System.out.printf("%nWill try to generate tests for %d classes.%n", succeeded);
+        System.out.printf("%nWill try to generate tests for %d classes:%n", succeeded);
+        for(String className: classnames){
+         System.out.println(" - "+className);
+        }
       } else {
         System.out.printf(
             "%nWill try to generate tests for %d out of %d classes.%n",
@@ -760,7 +793,7 @@ public class OperationModel {
   }
 
   /** Creates and adds the Object class default constructor call to the concrete operations. */
-  private void addObjectConstructor() {
+  public void addObjectConstructor() {
     Constructor<?> objectConstructor;
     try {
       objectConstructor = Object.class.getConstructor();
