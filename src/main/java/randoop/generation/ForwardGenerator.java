@@ -94,9 +94,7 @@ public class ForwardGenerator extends AbstractGenerator {
    */
   private Set<Object> runtimePrimitivesSeen = new LinkedHashSet<>();
 
-  public Set<ClassOrInterfaceType> classesUnderTest;
-
-  public TypedOperationSelectorBasedOnTargetInputClasses typedOperationSelectorBasedOnTargetInputClasses;
+  private TypedOperationSelectorBasedOnTargetInputClasses typedOperationSelectorBasedOnTargetInputClasses;
 
   /**
    * Create a forward generator.
@@ -149,7 +147,6 @@ public class ForwardGenerator extends AbstractGenerator {
 
     this.sideEffectFreeMethods = sideEffectFreeMethods;
     this.instantiator = componentManager.getTypeInstantiator();
-    this.classesUnderTest = classesUnderTest;
     this.mandatoryMethodList = addOperationsRelatedToMandatoryMethods(GenInputsAbstract.methodlist,
         VisibilityPredicate.IS_PUBLIC);
     //this.typedOperationSelectorBasedOnTargetClasses = new TypedOperationSelectorBasedOnTargetClasses(this.mandatoryMethodList);
@@ -176,8 +173,7 @@ public class ForwardGenerator extends AbstractGenerator {
       default:
         throw new Error("Unhandled input_selection: " + GenInputsAbstract.input_selection);
     }
-    this.typedOperationSelectorBasedOnTargetInputClasses = new TypedOperationSelectorBasedOnTargetInputClasses(
-        this.classesUnderTest, this.mandatoryMethodList, this.operationSelector.getOperations());
+    this.typedOperationSelectorBasedOnTargetInputClasses = new TypedOperationSelectorBasedOnTargetInputClasses(this.mandatoryMethodList, this.operationSelector.getOperations());
   }
 
   public Set<TypedOperation> addOperationsRelatedToMandatoryMethods(Path methodSignatures_file,
