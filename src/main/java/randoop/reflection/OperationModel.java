@@ -615,7 +615,6 @@ public class OperationModel {
    *     heuristic
    * @param errorHandler the handler for bad class names
    * @param literalsFileList the list of literals file names
-   * Receber a informação do target method aqui.
    */
   private void addClassTypes(
       VisibilityPredicate visibility,

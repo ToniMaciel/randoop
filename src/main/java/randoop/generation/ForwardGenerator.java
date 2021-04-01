@@ -915,7 +915,6 @@ public class ForwardGenerator extends AbstractGenerator {
 
       // Attempt with some probability to use a variable already in S.
       //We may force Randoop to always try to use variable already defined in S.
-      //Se ao final, o array das variáveis, não tiver nada, passaria para o próximo passo.
       if (GenInputsAbstract.alias_ratio != 0
           && Randomness.weightedCoinFlip(GenInputsAbstract.alias_ratio)) {
 
@@ -986,11 +985,9 @@ public class ForwardGenerator extends AbstractGenerator {
           .getGenericClassType()
           .isSubtypeOf(JDKTypes.COLLECTION_TYPE)) {
         InstantiatedType classType = (InstantiatedType) inputType;
-        //ver o que ocorre nestas chamadas de métodos getSequencesForType...
         SimpleList<Sequence> l1 = componentManager.getSequencesForType(operation, i, isReceiver);
         Log.logPrintf("Collection creation heuristic: will create helper of type %s%n", classType);
         SimpleArrayList<Sequence> l2 = new SimpleArrayList<>();
-        //Bem como ver que ocorre nestas chamadas de métodos createCollection...
         Sequence creationSequence =
             HelperSequenceCreator.createCollection(componentManager, classType);
         if (creationSequence != null) {

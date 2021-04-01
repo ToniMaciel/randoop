@@ -39,6 +39,7 @@ import randoop.types.ClassOrInterfaceType;
 import randoop.types.Type;
 import randoop.util.MultiMap;
 import randoop.util.ReflectionExecutor;
+import randoop.util.Report;
 
 /**
  * Test special cases of covered class filtering. Want to ensure behaves well when given abstract
@@ -134,6 +135,13 @@ public class SpecialCoveredClassTest {
     List<ExecutableSequence> rTests = testGenerator.getRegressionSequences();
     System.out.println("number of regression tests: " + rTests.size());
     assertFalse(rTests.isEmpty());
+
+    Report report = new Report();
+    try {
+      report.generateReport(rTests);
+    } catch (IllegalAccessException e) {
+      System.out.println(e);
+    }
 
     List<ExecutableSequence> eTests = testGenerator.getErrorTestSequences();
     CoveredClassTest.assertNoTests(eTests, "error");

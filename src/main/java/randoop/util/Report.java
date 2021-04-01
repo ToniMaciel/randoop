@@ -28,9 +28,10 @@ public class Report {
     Map<Class<?>, Integer> uniqueObjectsCreated;
 
     /**TODO Detalhar o funcionamento desse método
-     * 
-     * @param rTests Sequência de teste de regressão para fazer a revisão
-     * @throws IllegalAccessException
+     *
+     * @param rTests Sequencia de teste de regressão para fazer a revisao
+     * @throws IllegalAccessException Um lancado pelo metodo de verificacao de fields, com a dependencia externa creio que
+     * nao lancara mais essa excecao
      */
 
     public void generateReport(List<ExecutableSequence> rTests) throws IllegalAccessException {
