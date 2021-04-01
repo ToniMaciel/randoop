@@ -1,0 +1,1 @@
+instrument.testcase.Aux.gluetext(java.lang.String, java.lang.String)
