@@ -27,6 +27,12 @@ public class Report {
     ArrayList<Object> uniqueObjects;
     Map<Class<?>, Integer> uniqueObjectsCreated;
 
+    /**TODO Detalhar o funcionamento desse método
+     * 
+     * @param rTests Sequência de teste de regressão para fazer a revisão
+     * @throws IllegalAccessException
+     */
+
     public void generateReport(List<ExecutableSequence> rTests) throws IllegalAccessException {
         for (ExecutableSequence test : rTests) {
             for (int i = 0; i < test.sequence.size(); i++) {
@@ -107,7 +113,7 @@ public class Report {
     @SuppressWarnings({"DefaultCharset", "CatchAndPrintStackTrace"})
     private void generateCSV(){
         try {
-            PrintWriter writer = new PrintWriter(new File("C:\\Users\\Toni\\Downloads\\ic\\teste\\methods_report.csv"));
+            PrintWriter writer = new PrintWriter(new File("methods_report.csv"));
 
             StringBuilder sb = new StringBuilder();
             sb.append("Metodos chamados");
@@ -132,7 +138,7 @@ public class Report {
         }
 
         try {
-            PrintWriter writer = new PrintWriter(new File("C:\\Users\\Toni\\Downloads\\ic\\teste\\objects_report.csv"));
+            PrintWriter writer = new PrintWriter(new File("objects_report.csv"));
 
             StringBuilder sb = new StringBuilder();
             sb.append("Classes dos objetos criados");

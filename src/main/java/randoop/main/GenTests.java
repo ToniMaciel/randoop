@@ -95,12 +95,7 @@ import randoop.test.ValidityCheckingGenerator;
 import randoop.test.ValueSizePredicate;
 import randoop.types.ClassOrInterfaceType;
 import randoop.types.Type;
-import randoop.util.Log;
-import randoop.util.MultiMap;
-import randoop.util.Randomness;
-import randoop.util.RandoopLoggingError;
-import randoop.util.ReflectionExecutor;
-import randoop.util.SimpleList;
+import randoop.util.*;
 import randoop.util.predicate.AlwaysFalse;
 
 /** Test generation. */
@@ -567,6 +562,13 @@ public class GenTests extends GenInputsAbstract {
       }
 
       List<ExecutableSequence> regressionSequences = explorer.getRegressionSequences();
+
+      Report report = new Report();
+      try {
+        report.generateReport(regressionSequences);
+      } catch (IllegalAccessException e) {
+        System.out.println(e);
+      }
 
       if (GenInputsAbstract.progressdisplay) {
         System.out.printf(
