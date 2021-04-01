@@ -163,13 +163,20 @@ public class OperationModel {
 
     // for debugging only
     model.omitMethods = omitMethods;
-    model.addOperationsRelatedToMandatoryMethods(GenInputsAbstract.methodlist, visibility, reflectionPredicate, classnames);
-    model.addClassTypes(visibility, reflectionPredicate, classnames, coveredClassesGoalNames, errorHandler, literalsFileList);
+
+    model.addClassTypes(
+        visibility,
+        reflectionPredicate,
+        classnames,
+        coveredClassesGoalNames,
+        errorHandler,
+        literalsFileList);
+
     model.omitMethodsPredicate = new OmitMethodsPredicate(omitMethods);
+    model.addOperationsRelatedToMandatoryMethods(GenInputsAbstract.methodlist, visibility, reflectionPredicate, classnames);
     model.addOperationsFromClasses(visibility, reflectionPredicate, operationSpecifications);
     model.addOperationsUsingSignatures(
-            GenInputsAbstract.methodlist, visibility, reflectionPredicate);
-    findClasses(classnames, model.operations);
+        GenInputsAbstract.methodlist, visibility, reflectionPredicate);
     model.addObjectConstructor();
 
     return model;
