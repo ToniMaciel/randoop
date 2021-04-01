@@ -12,21 +12,31 @@ public class TypedOperationSelectorBasedOnTargetInputClasses {
     private List<Class<?>> classesUnderTest;
     private int lastSelectedClassUndertestIndex;
 
-    public TypedOperationSelectorBasedOnTargetInputClasses(Set<TypedOperation> mandatoryMethodList,
+    public TypedOperationSelectorBasedOnTargetInputClasses(Set<ClassOrInterfaceType> classesUnderTest, Set<TypedOperation> mandatoryMethodList,
            List<TypedOperation> operations){
         this.classesUnderTestOperations = new LinkedHashMap<>();
         this.classesUnderTest = new ArrayList<>();
         this.mandatoryTypedOperations = new ArrayList<>();
         this.mandatoryTypedOperations.addAll(mandatoryMethodList);
         this.lastSelectedClassUndertestIndex = 0;
-        findObjectCreationOperatiosForTargetClasses(operations);
+        findObjectCreationOperatiosForTargetClasses(initializeList(classesUnderTest), operations);
+
+        Set<Class<?>> keys = this.classesUnderTestOperations.keySet();
+        for(Class<?> myClass: keys){
+            System.out.println(myClass);
+            System.out.println(this.classesUnderTestOperations.get(myClass).size());
+        }
+    }
+
+    private ArrayList<Class<?>> initializeList(Set<ClassOrInterfaceType> classesUnderTest){
+        ArrayList<Class<?>> aux = new ArrayList<>();
+        for(ClassOrInterfaceType classUnderTest: classesUnderTest){
+            aux.add(classUnderTest.getRuntimeClass());
+        }
+        return aux;
     }
 
     public TypedOperation selectTypedOperation(TypedOperationSelector operationSelector, int numSteps){
-        //1)Quero que todas as target classes e suas dependências, tenham ao menos 2 chamadas a métodos que
-        //são de seus respectivos tipos
-        //2) Nesse sentido, estas chamadas de métodos aconteceriam em 20%
-        //Enquanto as demais, corresponderiam a 80% (aleatório)
         if (numSteps%(10*this.classesUnderTestOperations.size()) < 2*this.classesUnderTestOperations.size()){ // &&
             return getTypedOperationOfClassUnderAnalysis(operationSelector);
         }else {
@@ -34,28 +44,27 @@ public class TypedOperationSelectorBasedOnTargetInputClasses {
         }
     }
 
-    private void findObjectCreationOperatiosForTargetClasses(List<TypedOperation> operations){
-        for(TypedOperation typedOperation: this.mandatoryTypedOperations){
-            for(Type type: typedOperation.getInputTypes()){
-                    getTypedOperationOfClass(operations, type.getRuntimeClass());
+    private void findObjectCreationOperatiosForTargetClasses(ArrayList<Class<?>> classesUnderTest, List<TypedOperation> operations){
+        for (TypedOperation typedOperation : operations) {
+            Class<?> aux = typedOperation.getOutputType().getRuntimeClass();
+            if(classesUnderTest.contains(aux)) {
+                getTypedOperationOfClass(typedOperation, aux);
             }
         }
     }
 
-    private void getTypedOperationOfClass(List<TypedOperation> operations, Class<?> targetClass){
-        for(TypedOperation typedOperation: operations){
-            if (typedOperation.getOutputType().getRuntimeClass().equals(targetClass) && (typedOperation.isConstructorCall() ||
-                (typedOperation.isStatic() && typedOperation.getName().contains("deserialize"))) && !this.classesUnderTestOperations
-                .keySet().contains(typedOperation.getClass())){
-                System.out.println("Object creation Operation for "+targetClass+": "+typedOperation.toString());
+    private void getTypedOperationOfClass(TypedOperation typedOperation, Class<?> targetClass){
+        if (typedOperation.getOutputType().getRuntimeClass().equals(targetClass) && (typedOperation.isConstructorCall() ||
+            (typedOperation.isStatic() && typedOperation.getName().contains("deserialise")))){ //&& !this.classesUnderTestOperations
+            if (!this.classesUnderTest.contains(targetClass)){
                 this.classesUnderTest.add(targetClass);
-                if (!this.classesUnderTestOperations.keySet().contains(targetClass)){
-                    List<TypedOperation> aux = new ArrayList<>();
-                    aux.add(typedOperation);
-                    this.classesUnderTestOperations.put(targetClass, aux);
-                }else{
-                    this.classesUnderTestOperations.get(targetClass).add(typedOperation);
-                }
+            }
+            if (!this.classesUnderTestOperations.keySet().contains(targetClass)){
+                List<TypedOperation> aux = new ArrayList<>();
+                aux.add(typedOperation);
+                this.classesUnderTestOperations.put(targetClass, aux);
+            }else if(!this.classesUnderTestOperations.get(targetClass).contains(typedOperation)){
+                this.classesUnderTestOperations.get(targetClass).add(typedOperation);
             }
         }
     }
@@ -80,4 +89,15 @@ public class TypedOperationSelectorBasedOnTargetInputClasses {
         }
     }
 
+    public LinkedHashMap<Class<?>, List<TypedOperation>> getClassesUnderTestOperations() {
+        return classesUnderTestOperations;
+    }
+
+    public List<TypedOperation> getMandatoryTypedOperations() {
+        return mandatoryTypedOperations;
+    }
+
+    public List<Class<?>> getClassesUnderTest() {
+        return classesUnderTest;
+    }
 }

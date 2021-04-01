@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -169,18 +170,12 @@ public class OperationModel {
     model.addOperationsUsingSignatures(
             GenInputsAbstract.methodlist, visibility, reflectionPredicate);
     findClasses(classnames, model.operations);
-    //com base nos métodos, fazer o cálculo das classes...
-    //um método, que altera esse parâmetro classnames
-
-
-    //model.addOperationsFromClasses(visibility, reflectionPredicate, operationSpecifications);
-
-    //model.addObjectConstructor();
+    model.addObjectConstructor();
 
     return model;
   }
 
-  private void addOperationsRelatedToMandatoryMethods(Path method_list, VisibilityPredicate visibility,
+  public void addOperationsRelatedToMandatoryMethods(Path method_list, VisibilityPredicate visibility,
       ReflectionPredicate reflectionPredicate, Set<@ClassGetName String> classnames) throws SignatureParseException {
     if (method_list == null) {
       return;
@@ -193,12 +188,22 @@ public class OperationModel {
             TypedClassOperation operation =
                 signatureToOperation(sig, visibility, reflectionPredicate);
             for(Type typeInput: operation.getInputTypes()){
-                if(!typeInput.isPrimitive()) {
+                if(!typeInput.isPrimitive() && !typeInput.isInterface() && !typeInput.isArray()
+                && !typeInput.isString()) {
                   classTypes.add(ClassOrInterfaceType.forClass(typeInput.getRuntimeClass()));
                   classnames.add(typeInput.getRuntimeClass().getName());
                 }
+                for(Field typeInputField: typeInput.getRuntimeClass().getFields()){
+                  if(!typeInputField.getType().isPrimitive() && !typeInputField.getType().isArray() &&
+                      !typeInputField.getType().isInterface() &&
+                      !typeInputField.getType().isAssignableFrom(List.class) && !typeInputField.getType().isAssignableFrom(String.class)) {
+                    classTypes.add(ClassOrInterfaceType.forClass(typeInputField.getType()));
+                    classnames.add(typeInputField.getType().getName());
+                  }
+                }
             }
-            if(!operation.getOutputType().isPrimitive()){
+            if(!operation.getOutputType().isPrimitive() && !operation.getOutputType().isInterface() &&
+                !operation.getOutputType().isArray() && !operation.getOutputType().isString()){
               classTypes.add(ClassOrInterfaceType.forClass(operation.getOutputType().getRuntimeClass()));
               classnames.add(operation.getOutputType().getRuntimeClass().getName());
             }
@@ -659,6 +664,9 @@ public class OperationModel {
         System.out.printf(
             "%nWill try to generate tests for %d out of %d classes.%n",
             succeeded, classnames.size());
+        for(String className: classnames){
+          System.out.println(" - "+className);
+        }
       }
     }
 
@@ -735,7 +743,7 @@ public class OperationModel {
    * @param reflectionPredicate the reflection predicate
    * @throws SignatureParseException if any signature is syntactically invalid
    */
-  private void addOperationsUsingSignatures(
+  public void addOperationsUsingSignatures(
       Path methodSignatures_file,
       VisibilityPredicate visibility,
       ReflectionPredicate reflectionPredicate)

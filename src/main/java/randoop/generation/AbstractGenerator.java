@@ -19,6 +19,7 @@ import randoop.operation.TypedOperation;
 import randoop.sequence.ExecutableSequence;
 import randoop.sequence.Sequence;
 import randoop.test.TestCheckGenerator;
+import randoop.types.ClassOrInterfaceType;
 import randoop.util.Log;
 import randoop.util.ProgressDisplay;
 import randoop.util.ReflectionExecutor;
@@ -141,6 +142,8 @@ public abstract class AbstractGenerator {
   protected TestCheckGenerator checkGenerator;
 
   protected OperationHistoryLogInterface operationHistory;
+
+  protected Set<ClassOrInterfaceType> classesUnderTest;
 
   /**
    * Constructs a generator with the given parameters.
@@ -450,9 +453,8 @@ public abstract class AbstractGenerator {
         Log.logPrintf("allSequences.size()=%s%n", numGeneratedSequences());
         // componentManager.log();
       }
-      if (num_sequences_generated%50 == 0) addTargetMethod();
+      if (num_sequences_generated%(10*classesUnderTest.size()) == 0) addTargetMethod();
     }
-//    addTargetMethod();
 
     if (GenInputsAbstract.progressdisplay && progressDisplay != null) {
       progressDisplay.display(!GenInputsAbstract.deterministic);

@@ -147,6 +147,7 @@ public class ForwardGenerator extends AbstractGenerator {
 
     this.sideEffectFreeMethods = sideEffectFreeMethods;
     this.instantiator = componentManager.getTypeInstantiator();
+    this.classesUnderTest = classesUnderTest;
     this.mandatoryMethodList = addOperationsRelatedToMandatoryMethods(GenInputsAbstract.methodlist,
         VisibilityPredicate.IS_PUBLIC);
     //this.typedOperationSelectorBasedOnTargetClasses = new TypedOperationSelectorBasedOnTargetClasses(this.mandatoryMethodList);
@@ -173,7 +174,7 @@ public class ForwardGenerator extends AbstractGenerator {
       default:
         throw new Error("Unhandled input_selection: " + GenInputsAbstract.input_selection);
     }
-    this.typedOperationSelectorBasedOnTargetInputClasses = new TypedOperationSelectorBasedOnTargetInputClasses(this.mandatoryMethodList, this.operationSelector.getOperations());
+    this.typedOperationSelectorBasedOnTargetInputClasses = new TypedOperationSelectorBasedOnTargetInputClasses(this.classesUnderTest, this.mandatoryMethodList, this.operationSelector.getOperations());
   }
 
   public Set<TypedOperation> addOperationsRelatedToMandatoryMethods(Path methodSignatures_file,
@@ -1188,4 +1189,13 @@ public class ForwardGenerator extends AbstractGenerator {
             "runtimePrimitivesSeen:" + runtimePrimitivesSeen.size()))
         + ")";
   }
+
+  public Set<ClassOrInterfaceType> getClassesUnderTest() {
+    return classesUnderTest;
+  }
+
+  public TypedOperationSelectorBasedOnTargetInputClasses getTypedOperationSelectorBasedOnTargetInputClasses() {
+    return typedOperationSelectorBasedOnTargetInputClasses;
+  }
+
 }
