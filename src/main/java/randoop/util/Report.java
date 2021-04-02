@@ -27,9 +27,9 @@ public class Report {
     ArrayList<Object> uniqueObjects;
     Map<Class<?>, Integer> uniqueObjectsCreated;
 
-    /**TODO Detalhar o funcionamento desse método
+    /**TODO Detalhar o funcionamento desse metodo
      *
-     * @param rTests Sequencia de teste de regressão para fazer a revisao
+     * @param rTests Sequencia de teste de regressao para fazer a revisao
      * @throws IllegalAccessException Um lancado pelo metodo de verificacao de fields, com a dependencia externa creio que
      * nao lancara mais essa excecao
      */
@@ -146,7 +146,7 @@ public class Report {
             sb.append(',');
             sb.append("Quantidade de objetos criados");
             sb.append(',');
-            sb.append("Quantidade de objetos únicos criados");
+            sb.append("Quantidade de objetos unicos criados");
             sb.append('\n');
 
             for (Map.Entry<Class<?>, Integer> entry : objectsCreated.entrySet()) {
