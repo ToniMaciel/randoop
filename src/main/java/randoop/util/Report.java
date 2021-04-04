@@ -139,7 +139,7 @@ public class Report {
             sb.append(',');
             sb.append("Quantidade de objetos criados");
             sb.append(',');
-            sb.append("Quantidade de objetos únicos criados");
+            sb.append("Quantidade de objetos unicos criados");
             sb.append('\n');
 
             for (Map.Entry<Class<?>, Integer> entry : objectsCreated.entrySet()) {
