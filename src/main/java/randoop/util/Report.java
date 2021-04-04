@@ -33,7 +33,6 @@ public class Report {
      * @throws IllegalAccessException Um lancado pelo metodo de verificacao de fields, com a dependencia externa creio que
      * nao lancara mais essa excecao
      */
-
     public void generateReport(List<ExecutableSequence> rTests) throws IllegalAccessException {
         for (ExecutableSequence test : rTests) {
             for (int i = 0; i < test.sequence.size(); i++) {
