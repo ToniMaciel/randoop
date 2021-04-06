@@ -137,12 +137,8 @@ public class SpecialCoveredClassTest {
     assertFalse(rTests.isEmpty());
 
     Report report = new Report();
-    try {
-      report.generateReport(rTests);
-    } catch (IllegalAccessException e) {
-      System.out.println(e);
-    }
-
+    report.generateReport(rTests);
+    
     List<ExecutableSequence> eTests = testGenerator.getErrorTestSequences();
     CoveredClassTest.assertNoTests(eTests, "error");
 
