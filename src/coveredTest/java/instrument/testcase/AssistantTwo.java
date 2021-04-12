@@ -1,13 +1,13 @@
 package instrument.testcase;
 
-public class AuxTwo {
+public class AssistantTwo {
   public int numberOne;
 
-  public AuxTwo(int i){
+  public AssistantTwo(int i){
     this.numberOne = i;
   }
 
-  public AuxTwo(int i, int o){
+  public AssistantTwo(int i, int o){
     this.numberOne = i+o;
   }
 

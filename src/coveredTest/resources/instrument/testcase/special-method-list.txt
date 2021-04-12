@@ -1,1 +1,1 @@
-instrument.testcase.Aux.gluetext(java.lang.String, java.lang.String)
+instrument.testcase.Assistant.gluetext(java.lang.String, java.lang.String)

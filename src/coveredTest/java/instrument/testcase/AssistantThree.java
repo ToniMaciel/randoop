@@ -1,9 +1,9 @@
 package instrument.testcase;
 
-public abstract class AuxThree implements MyInterface{
+public abstract class AssistantThree implements MyInterface{
   public int numberOne;
 
-  public AuxThree(int i){
+  public AssistantThree(int i){
     this.numberOne = i;
   }
 

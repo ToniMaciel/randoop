@@ -1,4 +1,4 @@
-instrument.testcase.Aux
+instrument.testcase.Assistant
 instrument.testcase.MyInterface
-instrument.testcase.AuxThree
-instrument.testcase.AuxTwo
+instrument.testcase.AssistantThree
+instrument.testcase.AssistantTwo

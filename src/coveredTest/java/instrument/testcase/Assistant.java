@@ -1,13 +1,13 @@
 package instrument.testcase;
 
-public class Aux {
+public class Assistant {
   public MyInterface sum;
-  public AuxTwo auxTwo;
-  public AuxThree auxThree;
+  public AssistantTwo auxTwo;
+  public AssistantThree auxThree;
   public String name;
 
-  public Aux(){
-    this.auxTwo = new AuxTwo(1);
+  public Assistant(){
+    this.auxTwo = new AssistantTwo(1);
     this.name = "Hi!";
   }
 
@@ -15,8 +15,8 @@ public class Aux {
     this.sum = sum;
   }
 
-  public AuxReturn gluetext(String one, String two){
-    return new AuxReturn(one + " : " + two + " : "+this.name);
+  public AssistantReturn gluetext(String one, String two){
+    return new AssistantReturn(one + " : " + two + " : "+this.name);
   }
 
   @Override

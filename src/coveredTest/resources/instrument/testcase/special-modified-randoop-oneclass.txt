@@ -1,1 +1,1 @@
-instrument.testcase.Aux
+instrument.testcase.Assistant

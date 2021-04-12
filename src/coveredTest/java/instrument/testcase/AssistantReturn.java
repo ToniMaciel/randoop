@@ -1,9 +1,9 @@
 package instrument.testcase;
 
-public class AuxReturn {
+public class AssistantReturn {
   public String text;
 
-  public AuxReturn(String text){
+  public AssistantReturn(String text){
     this.text = text;
   }
 

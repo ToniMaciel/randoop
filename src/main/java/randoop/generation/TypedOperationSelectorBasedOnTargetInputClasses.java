@@ -54,8 +54,8 @@ public class TypedOperationSelectorBasedOnTargetInputClasses {
     }
 
     private void getTypedOperationOfClass(TypedOperation typedOperation, Class<?> targetClass){
-        if (typedOperation.getOutputType().getRuntimeClass().equals(targetClass) && (typedOperation.isConstructorCall() ||
-            (typedOperation.isStatic() && typedOperation.getName().contains("deserialise")))){ //&& !this.classesUnderTestOperations
+        if (typedOperation.getOutputType().getRuntimeClass().equals(targetClass) &&
+            (typedOperation.isConstructorCall() || typedOperation.getName().contains("deserialize"))){ //&& !this.classesUnderTestOperations
             if (!this.classesUnderTest.contains(targetClass)){
                 this.classesUnderTest.add(targetClass);
             }
