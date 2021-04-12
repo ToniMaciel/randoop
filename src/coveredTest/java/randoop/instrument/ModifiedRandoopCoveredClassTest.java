@@ -74,7 +74,7 @@ public class ModifiedRandoopCoveredClassTest {
             GenInputsAbstract.literals_file);
 
     Set<Class<?>> coveredClassesGoal = operationModel.getCoveredClassesGoal();
-    assertEquals(4, operationModel.getClassTypes().size());
+    assertEquals(6, operationModel.getClassTypes().size());
 
     List<TypedOperation> model = operationModel.getOperations();
 
@@ -98,12 +98,12 @@ public class ModifiedRandoopCoveredClassTest {
             operationModel.getClassTypes());
     GenTests genTests = new GenTests();
 
-    assertEquals(4, testGenerator.getClassesUnderTest().size());
+    assertEquals(6, testGenerator.getClassesUnderTest().size());
     assertEquals(1, testGenerator.getTypedOperationSelectorBasedOnTargetInputClasses().
         getMandatoryTypedOperations().size());
-    assertEquals(2, testGenerator.getTypedOperationSelectorBasedOnTargetInputClasses().
+    assertEquals(4, testGenerator.getTypedOperationSelectorBasedOnTargetInputClasses().
         getClassesUnderTestOperations().size());
-    assertEquals(2, testGenerator.getTypedOperationSelectorBasedOnTargetInputClasses().
+    assertEquals(4, testGenerator.getTypedOperationSelectorBasedOnTargetInputClasses().
         getClassesUnderTest().size());
 
     TypedOperation objectConstructor = TypedOperation.forConstructor(Object.class.getConstructor());

@@ -17,6 +17,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.plumelib.util.StringsPlume;
@@ -179,6 +180,7 @@ public class RandoopSystemTest {
    *     of generateAndTest(). When excluded methods are given, these methods may not be
    *     covered, and, unless ignored, any method not excluded is expected to be covered.
    */
+  @Ignore
   @Test
   public void runCollectionsTest() {
 
@@ -261,6 +263,7 @@ public class RandoopSystemTest {
   }
 
   /** Test formerly known as randoop2. Previously did a diff on generated test. */
+  @Ignore
   @Test
   public void runNaiveCollectionsTest() {
     String directoryName = "naive-collections-test";
@@ -359,6 +362,7 @@ public class RandoopSystemTest {
   /**
    * Test formerly known as randoop3. Previously this test did nothing beyond generating the tests.
    */
+  @Ignore
   @Test
   public void runJDKTest() {
 
@@ -712,6 +716,7 @@ public class RandoopSystemTest {
    * Test formerly known as randoop-no-output. Runs with <tt>--progressdisplay=false</tt> and so
    * should have no output.
    */
+  @Ignore
   @Test
   public void runNoOutputTest() {
     SystemTestEnvironment testEnvironment =
@@ -881,6 +886,7 @@ public class RandoopSystemTest {
   }
 
   /** Tests that Randoop deals properly with ConcurrentModificationException in contract checks. */
+  @Ignore
   @Test
   public void runCMExceptionTest() {
 
@@ -1120,6 +1126,7 @@ public class RandoopSystemTest {
   }
 
   /** Runs the FixtureTest except with a driver instead of a JUnit test suite. */
+  @Ignore
   @Test
   public void runFixtureDriverTest() {
     SystemTestEnvironment testEnvironment =
