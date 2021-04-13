@@ -22,16 +22,31 @@ public class Report {
         this.uniqueObjectsCreated = new HashMap<>();
     }
 
-    Map<Operation, Integer> methodsCalled;
-    Map<Class<?>, Integer> objectsCreated;
-    ArrayList<Object> uniqueObjects;
-    Map<Class<?>, Integer> uniqueObjectsCreated;
+    /**The operations and the number of times that they are called in tests */
+    public Map<Operation, Integer> methodsCalled;
 
-    /**TODO Detalhar o funcionamento desse metodo
-     *
-     * @param rTests Sequencia de teste de regressao para fazer a revisao
+    /**The classes of objects created in tests and their number of times */
+    public Map<Class<?>, Integer> objectsCreated;
+
+    /**A list of distinct objects at the end of each test */
+    public ArrayList<Object> uniqueObjects;
+
+    /**The classes of distinct objects at the end of each test and their number of times */
+    public Map<Class<?>, Integer> uniqueObjectsCreated;
+
+    /**
+     * Iterate over all ExecutableSequence in the given list, in each of this ExecutableSequence, will iterate over their sequences. 
+     * Then, will get the operation of the sequence and if it doesn't an non-receiving type, increments the number of times that this 
+     * operations is called along the tests. For the last, will analyses the runtimeValue of the execution of this sequence, and then, 
+     * if does't null, the number of times that objects of the class of the  sequence's outcome are created will be incremented and it 
+     * will be verified if there is an object with the same values of the oucome in previous tests execution's and, depending on the result,
+     * the analysis of single objects will also be increased.
      * 
+     * Observation: This method is called in gentest's class. For now, it only generates reports of regression tests. 
+     *  
+     * @param rTests List of ExecutableSequences of a test
      */
+
     public void generateReport(List<ExecutableSequence> rTests) {
         for (ExecutableSequence test : rTests) {
             for (int i = 0; i < test.sequence.size(); i++) {
@@ -52,6 +67,14 @@ public class Report {
         generateCSV();
     }
 
+    /**
+     * Will iterate over the list of unique objects created and check with the EqualsBuilder 
+     * if there is an object that is equal to outcome.
+     * 
+     * @param outcome The runtimeValue of a statement output 
+     * @return true, if there isn't a object equals outcome created in previous statements, otherwise, it is false.
+     */
+
     private boolean IsUniqueObject(Object outcome)  {
         for (Object uniqueObject : uniqueObjects){
             if (outcome.getClass().equals(uniqueObject.getClass())) {
@@ -63,6 +86,14 @@ public class Report {
         return true;
     }
 
+    /**
+     * It gets the result of executing the index-th element of the sequence, if this execution is a normal execution. 
+     *
+     * @param test The ExecutableSequence under analysis
+     * @param i The index of the sequence under analysis
+     * @return The runtimeTime value of the execution of the sequence that are being analysed (which can be null), or null if this execution isn't a normal execution
+     */
+
     private Object executionValue(ExecutableSequence test, int i) {
         ExecutionOutcome result = test.getResult(i);
         if (result instanceof NormalExecution ) {
@@ -71,6 +102,10 @@ public class Report {
         return null;
     }
 
+     /** Generates two csv files: One with the report for methods called and other with the report for objects created in the tests.
+     * 
+     * Observation: Those csvs will be in the directory where the randoop was executaded.
+     */
     @SuppressWarnings({"DefaultCharset", "CatchAndPrintStackTrace"})
     private void generateCSV(){
         try {
