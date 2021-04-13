@@ -1,12 +1,12 @@
 package randoop.util;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import randoop.ExecutionOutcome;
 import randoop.NormalExecution;
 import randoop.operation.Operation;
 import randoop.sequence.ExecutableSequence;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,10 +30,9 @@ public class Report {
     /**TODO Detalhar o funcionamento desse metodo
      *
      * @param rTests Sequencia de teste de regressao para fazer a revisao
-     * @throws IllegalAccessException Um lancado pelo metodo de verificacao de fields, com a dependencia externa creio que
-     * nao lancara mais essa excecao
+     * 
      */
-    public void generateReport(List<ExecutableSequence> rTests) throws IllegalAccessException {
+    public void generateReport(List<ExecutableSequence> rTests) {
         for (ExecutableSequence test : rTests) {
             for (int i = 0; i < test.sequence.size(); i++) {
                 Operation operation = test.sequence.getStatement(i).getOperation().getOperation();
@@ -53,52 +52,14 @@ public class Report {
         generateCSV();
     }
 
-    private boolean IsUniqueObject(Object outcome) throws IllegalAccessException {
-        for (Object uniqueObject : uniqueObjects) {
-            if(outcome.getClass().equals(uniqueObject.getClass())){
-                if (outcome == uniqueObject)
+    private boolean IsUniqueObject(Object outcome)  {
+        for (Object uniqueObject : uniqueObjects){
+            if (outcome.getClass().equals(uniqueObject.getClass())) {
+                if(EqualsBuilder.reflectionEquals(outcome, uniqueObject, true))
                     return false;
-                else if (outcome.equals(uniqueObject))
-                    return false;
-                else{
-                    Class<?> classObject = outcome.getClass();
-                    boolean equal = true;
-
-                    do {
-                        Field[] fields = classObject.getDeclaredFields();
-
-                        for (Field field : fields) {
-                            field.setAccessible(true);
-
-                            Object fieldResultOutcome = field.get(outcome);
-                            Object fieldResultObject = field.get(uniqueObject);
-
-                            if (fieldResultOutcome == null) {
-                                if (fieldResultObject != null) {
-                                    equal = false;
-                                    break;
-                                }
-                            } else if (fieldResultObject == null) {
-                                equal = false;
-                                break;
-                            } else if (!fieldResultOutcome.equals(fieldResultObject)) {
-                                equal = false;
-                                break;
-                            }
-                        }
-
-                        if (equal)
-                            classObject = classObject.getSuperclass();
-                        else
-                            break;
-
-                    } while (classObject.getSuperclass() != null);
-
-                    if(equal)
-                        return false;
-                }
             }
         }
+    
         return true;
     }
 
