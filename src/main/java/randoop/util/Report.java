@@ -113,12 +113,12 @@ public class Report {
     @SuppressWarnings({"DefaultCharset", "CatchAndPrintStackTrace"})
     private void generateCSV(){
         try {
-            PrintWriter writer = new PrintWriter(new File("methods_report.csv"));
+            PrintWriter writer = new PrintWriter(new File("methods_report.csv(ModifiedRandoop)"));
 
             StringBuilder sb = new StringBuilder();
-            sb.append("Metodos chamados");
+            sb.append("Methods called");
             sb.append(',');
-            sb.append("Quantidade de vezes");
+            sb.append("Number of times");
             sb.append('\n');
 
             for (Map.Entry<Operation, Integer> entry : methodsCalled.entrySet()) {
@@ -138,14 +138,14 @@ public class Report {
         }
 
         try {
-            PrintWriter writer = new PrintWriter(new File("objects_report.csv"));
+            PrintWriter writer = new PrintWriter(new File("objects_report.csv(ModifiedRandoop)"));
 
             StringBuilder sb = new StringBuilder();
-            sb.append("Classes dos objetos criados");
+            sb.append("Classes of objects created");
             sb.append(',');
-            sb.append("Quantidade de objetos criados");
+            sb.append("Number of objects created");
             sb.append(',');
-            sb.append("Quantidade de objetos unicos criados");
+            sb.append("Number of unique objects manipulated");
             sb.append('\n');
 
             for (Map.Entry<Class<?>, Integer> entry : objectsCreated.entrySet()) {
