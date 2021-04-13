@@ -184,6 +184,7 @@ public class GenTests extends GenInputsAbstract {
         throw new ArgException("Unrecognized command-line arguments: " + Arrays.toString(nonargs));
       }
     } catch (ArgException ae) {
+      // usage() exits the program by calling System.exit().
       usage("While parsing command-line arguments: %s", ae.getMessage());
     }
 
@@ -505,9 +506,7 @@ public class GenTests extends GenInputsAbstract {
     try {
       explorer.createAndClassifySequences();
     } catch (SequenceExceptionError e) {
-
       printSequenceExceptionError(explorer, e);
-
       System.exit(1);
     } catch (RandoopInstantiationError e) {
       throw new RandoopBug("Error instantiating operation " + e.getOpName(), e);
@@ -704,11 +703,12 @@ public class GenTests extends GenInputsAbstract {
       Map<TypedClassOperation, Integer> flakyOccurrences =
           countSequencesPerOperation(flakySequences, assertableSideEffectFreeMethods);
 
+      // TODO: This isn't exactly tf-idf, though it may be a useful metric nonetheless.
       // Priority queue of methods ordered by tf-idf heuristic, highest first.
       PriorityQueue<RankedTypeOperation> methodHeuristicPriorityQueue =
           new PriorityQueue<>(TypedOperation.compareRankedTypeOperation.reversed());
       for (TypedClassOperation op : flakyOccurrences.keySet()) {
-        double tfIdfMetric = flakyOccurrences.get(op) / testOccurrences.get(op);
+        double tfIdfMetric = (double) flakyOccurrences.get(op) / testOccurrences.get(op);
         RankedTypeOperation rankedMethod = new RankedTypeOperation(tfIdfMetric, op);
         methodHeuristicPriorityQueue.add(rankedMethod);
       }
