@@ -109,7 +109,7 @@ public class Report {
     @SuppressWarnings({"DefaultCharset", "CatchAndPrintStackTrace"})
     private void generateCSV(){
         try {
-            PrintWriter writer = new PrintWriter(new File("methods_report(ModifiedRandoop).csv"));
+            PrintWriter writer = new PrintWriter(new File("methods_report.csv"));
 
             StringBuilder sb = new StringBuilder();
             sb.append("Methods called");
@@ -134,7 +134,7 @@ public class Report {
         }
 
         try {
-            PrintWriter writer = new PrintWriter(new File("objects_report(ModifiedRandoop).csv"));
+            PrintWriter writer = new PrintWriter(new File("objects_report.csv"));
 
             StringBuilder sb = new StringBuilder();
             sb.append("Classes of objects created");
