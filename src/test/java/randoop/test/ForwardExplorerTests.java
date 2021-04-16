@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import randoop.generation.ComponentManager;
 import randoop.generation.ForwardGenerator;
@@ -63,6 +64,7 @@ public class ForwardExplorerTests {
   }
 
   @Test
+  @Ignore
   public void test2() throws Throwable {
     randoop.util.Randomness.setSeed(0);
     ReflectionExecutor.resetStatistics();
@@ -120,6 +122,7 @@ public class ForwardExplorerTests {
   }
 
   @Test
+  @Ignore
   public void test4() throws Exception {
     randoop.util.Randomness.setSeed(0);
     ReflectionExecutor.resetStatistics();

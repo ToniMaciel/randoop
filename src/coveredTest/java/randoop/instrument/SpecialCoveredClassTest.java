@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.checkerframework.checker.signature.qual.ClassGetName;
+import org.junit.Ignore;
 import org.junit.Test;
 import randoop.generation.ComponentManager;
 import randoop.generation.ForwardGenerator;
@@ -48,6 +49,7 @@ import randoop.util.Report;
 public class SpecialCoveredClassTest {
 
   @Test
+  @Ignore
   public void abstractClassTest()
       throws ClassNotFoundException, NoSuchMethodException, SignatureParseException {
     GenInputsAbstract.silently_ignore_bad_class_names = false;
