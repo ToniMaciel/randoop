@@ -563,11 +563,7 @@ public class GenTests extends GenInputsAbstract {
       List<ExecutableSequence> regressionSequences = explorer.getRegressionSequences();
 
       Report report = new Report();
-      try {
-        report.generateReport(regressionSequences);
-      } catch (IllegalAccessException e) {
-        System.out.println(e);
-      }
+      report.generateReport(regressionSequences);
 
       if (GenInputsAbstract.progressdisplay) {
         System.out.printf(
