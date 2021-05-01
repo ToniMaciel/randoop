@@ -210,7 +210,8 @@ public class OperationModel {
                 }
             }
             if(!operation.getOutputType().isPrimitive() && !operation.getOutputType().isInterface() &&
-                !operation.getOutputType().isArray() && !operation.getOutputType().isString()){
+                !operation.getOutputType().isArray() && !operation.getOutputType().isString()
+                && !operation.getOutputType().isVoid()){
               classTypes.add(ClassOrInterfaceType.forClass(operation.getOutputType().getRuntimeClass()));
               classnames.add(operation.getOutputType().getRuntimeClass().getName());
             }
