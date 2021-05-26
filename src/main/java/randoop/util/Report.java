@@ -1,12 +1,12 @@
 package randoop.util;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import randoop.ExecutionOutcome;
 import randoop.NormalExecution;
 import randoop.operation.Operation;
 import randoop.sequence.ExecutableSequence;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,18 +22,32 @@ public class Report {
         this.uniqueObjectsCreated = new HashMap<>();
     }
 
-    Map<Operation, Integer> methodsCalled;
-    Map<Class<?>, Integer> objectsCreated;
-    ArrayList<Object> uniqueObjects;
-    Map<Class<?>, Integer> uniqueObjectsCreated;
+    /**The operations and the number of times that they are called in tests */
+    public Map<Operation, Integer> methodsCalled;
 
-    /**TODO Detalhar o funcionamento desse metodo
-     *
-     * @param rTests Sequencia de teste de regressao para fazer a revisao
-     * @throws IllegalAccessException Um lancado pelo metodo de verificacao de fields, com a dependencia externa creio que
-     * nao lancara mais essa excecao
+    /**The classes of objects created in tests and their number of times */
+    public Map<Class<?>, Integer> objectsCreated;
+
+    /**A list of distinct objects at the end of each test */
+    public ArrayList<Object> uniqueObjects;
+
+    /**The classes of distinct objects at the end of each test and their number of times */
+    public Map<Class<?>, Integer> uniqueObjectsCreated;
+
+    /**
+     * Iterate over all ExecutableSequence in the given list, in each of this ExecutableSequence, will iterate over their sequences. 
+     * Then, will get the operation of the sequence and if it doesn't an non-receiving type, increments the number of times that this 
+     * operations is called along the tests. For the last, will analyses the runtimeValue of the execution of this sequence, and then, 
+     * if does't null, the number of times that objects of the class of the  sequence's outcome are created will be incremented and it 
+     * will be verified if there is an object with the same values of the oucome in previous tests execution's and, depending on the result,
+     * the analysis of single objects will also be increased.
+     * 
+     * Observation: This method is called in gentest's class. For now, it only generates reports of regression tests. 
+     *  
+     * @param rTests List of ExecutableSequences of a test
      */
-    public void generateReport(List<ExecutableSequence> rTests) throws IllegalAccessException {
+
+    public void generateReport(List<ExecutableSequence> rTests) {
         for (ExecutableSequence test : rTests) {
             for (int i = 0; i < test.sequence.size(); i++) {
                 Operation operation = test.sequence.getStatement(i).getOperation().getOperation();
@@ -53,54 +67,32 @@ public class Report {
         generateCSV();
     }
 
-    private boolean IsUniqueObject(Object outcome) throws IllegalAccessException {
-        for (Object uniqueObject : uniqueObjects) {
-            if(outcome.getClass().equals(uniqueObject.getClass())){
-                if (outcome == uniqueObject)
+    /**
+     * Will iterate over the list of unique objects created and check with the EqualsBuilder 
+     * if there is an object that is equal to outcome.
+     * 
+     * @param outcome The runtimeValue of a statement output 
+     * @return true, if there isn't a object equals outcome created in previous statements, otherwise, it is false.
+     */
+
+    private boolean IsUniqueObject(Object outcome)  {
+        for (Object uniqueObject : uniqueObjects){
+            if (outcome.getClass().equals(uniqueObject.getClass())) {
+                if(EqualsBuilder.reflectionEquals(outcome, uniqueObject, true))
                     return false;
-                else if (outcome.equals(uniqueObject))
-                    return false;
-                else{
-                    Class<?> classObject = outcome.getClass();
-                    boolean equal = true;
-
-                    do {
-                        Field[] fields = classObject.getDeclaredFields();
-
-                        for (Field field : fields) {
-                            field.setAccessible(true);
-
-                            Object fieldResultOutcome = field.get(outcome);
-                            Object fieldResultObject = field.get(uniqueObject);
-
-                            if (fieldResultOutcome == null) {
-                                if (fieldResultObject != null) {
-                                    equal = false;
-                                    break;
-                                }
-                            } else if (fieldResultObject == null) {
-                                equal = false;
-                                break;
-                            } else if (!fieldResultOutcome.equals(fieldResultObject)) {
-                                equal = false;
-                                break;
-                            }
-                        }
-
-                        if (equal)
-                            classObject = classObject.getSuperclass();
-                        else
-                            break;
-
-                    } while (classObject.getSuperclass() != null);
-
-                    if(equal)
-                        return false;
-                }
             }
         }
+    
         return true;
     }
+
+    /**
+     * It gets the result of executing the index-th element of the sequence, if this execution is a normal execution. 
+     *
+     * @param test The ExecutableSequence under analysis
+     * @param i The index of the sequence under analysis
+     * @return The runtimeTime value of the execution of the sequence that are being analysed (which can be null), or null if this execution isn't a normal execution
+     */
 
     private Object executionValue(ExecutableSequence test, int i) {
         ExecutionOutcome result = test.getResult(i);
@@ -110,15 +102,19 @@ public class Report {
         return null;
     }
 
+     /** Generates two csv files: One with the report for methods called and other with the report for objects created in the tests.
+     * 
+     * Observation: Those csvs will be in the directory where the randoop was executaded.
+     */
     @SuppressWarnings({"DefaultCharset", "CatchAndPrintStackTrace"})
     private void generateCSV(){
         try {
             PrintWriter writer = new PrintWriter(new File("methods_report.csv"));
 
             StringBuilder sb = new StringBuilder();
-            sb.append("Metodos chamados");
+            sb.append("Methods called");
             sb.append(',');
-            sb.append("Quantidade de vezes");
+            sb.append("Number of times");
             sb.append('\n');
 
             for (Map.Entry<Operation, Integer> entry : methodsCalled.entrySet()) {
@@ -141,11 +137,11 @@ public class Report {
             PrintWriter writer = new PrintWriter(new File("objects_report.csv"));
 
             StringBuilder sb = new StringBuilder();
-            sb.append("Classes dos objetos criados");
+            sb.append("Classes of objects created");
             sb.append(',');
-            sb.append("Quantidade de objetos criados");
+            sb.append("Number of objects created");
             sb.append(',');
-            sb.append("Quantidade de objetos unicos criados");
+            sb.append("Number of unique objects manipulated");
             sb.append('\n');
 
             for (Map.Entry<Class<?>, Integer> entry : objectsCreated.entrySet()) {
