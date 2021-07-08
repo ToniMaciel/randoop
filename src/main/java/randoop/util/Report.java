@@ -23,16 +23,19 @@ public class Report {
     }
 
     /**The operations and the number of times that they are called in tests */
-    public Map<Operation, Integer> methodsCalled;
+    private Map<Operation, Integer> methodsCalled;
 
     /**The classes of objects created in tests and their number of times */
-    public Map<Class<?>, Integer> objectsCreated;
+    private Map<Class<?>, Integer> objectsCreated;
 
     /**A list of distinct objects at the end of each test */
-    public ArrayList<Object> uniqueObjects;
+    private ArrayList<Object> uniqueObjects;
 
     /**The classes of distinct objects at the end of each test and their number of times */
-    public Map<Class<?>, Integer> uniqueObjectsCreated;
+    private Map<Class<?>, Integer> uniqueObjectsCreated;
+
+    /**The total number of tests analyzed */
+    private Integer totalTests;
 
     /**
      * Iterate over all ExecutableSequence in the given list, in each of this ExecutableSequence, will iterate over their sequences. 
@@ -44,11 +47,11 @@ public class Report {
      * 
      * Observation: This method is called in gentest's class. For now, it only generates reports of regression tests. 
      *  
-     * @param rTests List of ExecutableSequences of a test
+     * @param tests List of ExecutableSequences of a test
      */
 
-    public void generateReport(List<ExecutableSequence> rTests) {
-        for (ExecutableSequence test : rTests) {
+    public void generateReport(List<ExecutableSequence> tests)  {
+        for (ExecutableSequence test : tests) {
             for (int i = 0; i < test.sequence.size(); i++) {
                 Operation operation = test.sequence.getStatement(i).getOperation().getOperation();
                 if(!operation.isNonreceivingValue()){
@@ -82,7 +85,6 @@ public class Report {
                     return false;
             }
         }
-    
         return true;
     }
 
@@ -102,7 +104,7 @@ public class Report {
         return null;
     }
 
-     /** Generates two csv files: One with the report for methods called and other with the report for objects created in the tests.
+    /** Generates two csv files: One with the report for methods called and other with the report for objects created in the tests.
      * 
      * Observation: Those csvs will be in the directory where the randoop was executaded.
      */
@@ -112,18 +114,18 @@ public class Report {
             PrintWriter writer = new PrintWriter(new File("methods_report.csv"));
 
             StringBuilder sb = new StringBuilder();
-            sb.append("Methods called");
-            sb.append(',');
-            sb.append("Number of times");
-            sb.append('\n');
+            sb.append("Methods called" + ',');
+            sb.append("Number of times" + ',');
+            sb.append("Number of times (Normalized)" + '\n');
 
             for (Map.Entry<Operation, Integer> entry : methodsCalled.entrySet()) {
                 Operation operation = entry.getKey();
                 Integer value = entry.getValue();
-                sb.append("\"" + operation.toString() + "\"");
-                sb.append(',');
-                sb.append(value.toString());
-                sb.append('\n');
+                Double normalized_value = (double)value/totalTests;
+
+                sb.append("\"" + operation.toString() + "\"" + ',');
+                sb.append(value.toString() + ',');
+                sb.append(normalized_value.toString() + '\n');
             }
 
             writer.write(sb.toString());
@@ -137,23 +139,24 @@ public class Report {
             PrintWriter writer = new PrintWriter(new File("objects_report.csv"));
 
             StringBuilder sb = new StringBuilder();
-            sb.append("Classes of objects created");
-            sb.append(',');
-            sb.append("Number of objects created");
-            sb.append(',');
-            sb.append("Number of unique objects manipulated");
-            sb.append('\n');
+            sb.append("Classes of objects created" + ',');
+            sb.append("Number of objects created" + ',');
+            sb.append("Number of unique objects manipulated" + ',');
+            sb.append("Number of objects created (Normalized)" + ',');
+            sb.append("Number of unique objects manipulated (Normalized)" + '\n');
 
             for (Map.Entry<Class<?>, Integer> entry : objectsCreated.entrySet()) {
                 Class<?> objectClass = entry.getKey();
                 Integer value = entry.getValue();
                 Integer uniqueValue = uniqueObjectsCreated.get(objectClass);
-                sb.append(objectClass.toString());
-                sb.append(',');
-                sb.append(value.toString());
-                sb.append(',');
-                sb.append(uniqueValue.toString());
-                sb.append('\n');
+                Double normalized_value = (double)value/totalTests;
+                Double normalized_uniqueValue = (double)uniqueValue/totalTests;
+
+                sb.append(objectClass.toString() + ',');
+                sb.append(value.toString() + ',');
+                sb.append(uniqueValue.toString() + ',');
+                sb.append(normalized_value.toString() + ',');
+                sb.append(normalized_uniqueValue.toString() + '\n');
             }
 
             writer.write(sb.toString());
@@ -162,5 +165,9 @@ public class Report {
         } catch (FileNotFoundException e){
             System.out.println(e.getMessage());
         }
+    }
+
+    public void setTotalTests(Integer total){
+        this.totalTests = total;
     }
 }
