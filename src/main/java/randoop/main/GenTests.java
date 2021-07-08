@@ -538,6 +538,12 @@ public class GenTests extends GenInputsAbstract {
 
     JavaFileWriter javaFileWriter = new JavaFileWriter(junit_output_dir);
 
+    Report report = new Report();
+    List<ExecutableSequence> allSequences = explorer.getRegressionSequences();
+    allSequences.addAll(explorer.getErrorTestSequences());
+    report.setTotalTests(allSequences.size());
+    report.generateReport(allSequences);
+
     if (!GenInputsAbstract.no_error_revealing_tests) {
       CodeWriter codeWriter = javaFileWriter;
       if (GenInputsAbstract.minimize_error_test || GenInputsAbstract.stop_on_error_test) {
@@ -562,9 +568,6 @@ public class GenTests extends GenInputsAbstract {
       }
 
       List<ExecutableSequence> regressionSequences = explorer.getRegressionSequences();
-
-      Report report = new Report();
-      report.generateReport(regressionSequences);
 
       if (GenInputsAbstract.progressdisplay) {
         System.out.printf(
