@@ -51,6 +51,8 @@ public class Report {
      */
 
     public void generateReport(List<ExecutableSequence> tests)  {
+        setTotalTests(tests.size());
+        
         for (ExecutableSequence test : tests) {
             for (int i = 0; i < test.sequence.size(); i++) {
                 Operation operation = test.sequence.getStatement(i).getOperation().getOperation();
@@ -108,66 +110,61 @@ public class Report {
      * 
      * Observation: Those csvs will be in the directory where the randoop was executaded.
      */
-    @SuppressWarnings({"DefaultCharset", "CatchAndPrintStackTrace"})
     private void generateCSV(){
-        try {
-            PrintWriter writer = new PrintWriter(new File("methods_report.csv"));
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("Methods called" + ',');
-            sb.append("Number of times" + ',');
-            sb.append("Number of times (Normalized)" + '\n');
-
-            for (Map.Entry<Operation, Integer> entry : methodsCalled.entrySet()) {
-                Operation operation = entry.getKey();
-                Integer value = entry.getValue();
-                Double normalized_value = (double)value/totalTests;
-
-                sb.append("\"" + operation.toString() + "\"" + ',');
-                sb.append(value.toString() + ',');
-                sb.append(normalized_value.toString() + '\n');
-            }
-
-            writer.write(sb.toString());
-
-            writer.close();
-        } catch (FileNotFoundException e){
-            System.out.println(e.getMessage());
-        }
-
-        try {
-            PrintWriter writer = new PrintWriter(new File("objects_report.csv"));
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("Classes of objects created" + ',');
-            sb.append("Number of objects created" + ',');
-            sb.append("Number of unique objects manipulated" + ',');
-            sb.append("Number of objects created (Normalized)" + ',');
-            sb.append("Number of unique objects manipulated (Normalized)" + '\n');
-
-            for (Map.Entry<Class<?>, Integer> entry : objectsCreated.entrySet()) {
-                Class<?> objectClass = entry.getKey();
-                Integer value = entry.getValue();
-                Integer uniqueValue = uniqueObjectsCreated.get(objectClass);
-                Double normalized_value = (double)value/totalTests;
-                Double normalized_uniqueValue = (double)uniqueValue/totalTests;
-
-                sb.append(objectClass.toString() + ',');
-                sb.append(value.toString() + ',');
-                sb.append(uniqueValue.toString() + ',');
-                sb.append(normalized_value.toString() + ',');
-                sb.append(normalized_uniqueValue.toString() + '\n');
-            }
-
-            writer.write(sb.toString());
-
-            writer.close();
-        } catch (FileNotFoundException e){
-            System.out.println(e.getMessage());
-        }
+        writeCSV("methods_report.csv");
+        writeCSV("objects_report.csv");
     }
 
-    public void setTotalTests(Integer total){
+    private void setTotalTests(Integer total){
         this.totalTests = total;
+    }
+
+    @SuppressWarnings({"DefaultCharset", "CatchAndPrintStackTrace"})
+    private void writeCSV(String fileName){
+        try {
+            PrintWriter writer = new PrintWriter(new File(fileName));
+            StringBuilder sb = new StringBuilder();
+            
+            if(fileName.equals("methods_report.csv")){
+                sb.append("Methods called" + ',');
+                sb.append("Number of times" + ',');
+                sb.append("Number of times (Normalized)" + '\n');
+    
+                for (Map.Entry<Operation, Integer> entry : methodsCalled.entrySet()) {
+                    Operation operation = entry.getKey();
+                    Integer numberMethodsCalls = entry.getValue();
+                    Double normalized_numberMethodsCalls = (double)numberMethodsCalls/totalTests;
+    
+                    sb.append("\"" + operation.toString() + "\"" + ',');
+                    sb.append(numberMethodsCalls.toString() + ',');
+                    sb.append(normalized_numberMethodsCalls.toString() + '\n');
+                }
+            } else {
+                sb.append("Classes of objects created" + ',');
+                sb.append("Number of objects created" + ',');
+                sb.append("Number of unique objects manipulated" + ',');
+                sb.append("Number of objects created (Normalized)" + ',');
+                sb.append("Number of unique objects manipulated (Normalized)" + '\n');
+    
+                for (Map.Entry<Class<?>, Integer> entry : objectsCreated.entrySet()) {
+                    Class<?> objectClass = entry.getKey();
+                    Integer numberCreatedObjects = entry.getValue();
+                    Integer uniqueNumberCreatedObjects = uniqueObjectsCreated.get(objectClass);
+                    Double normalized_numberCreatedObjects = (double)numberCreatedObjects/totalTests;
+                    Double normalized_uniqueNumberCreatedObjects = (double)uniqueNumberCreatedObjects/totalTests;
+    
+                    sb.append(objectClass.toString() + ',');
+                    sb.append(numberCreatedObjects.toString() + ',');
+                    sb.append(uniqueNumberCreatedObjects.toString() + ',');
+                    sb.append(normalized_numberCreatedObjects.toString() + ',');
+                    sb.append(normalized_uniqueNumberCreatedObjects.toString() + '\n');
+                }
+            }
+            
+            writer.write(sb.toString());
+            writer.close();
+        } catch (FileNotFoundException e){
+            System.out.println(e.getMessage());
+        }
     }
 }
