@@ -110,7 +110,7 @@ public class Report {
      * 
      * Observation: Those csvs will be in the directory where the randoop was executaded.
      */
-    @SuppressWarnings({"DefaultCharset", "CatchAndPrintStackTrace"})
+    
     private void generateCSV(){
         writeCSV("methods_report.csv");
         writeCSV("objects_report.csv");
@@ -120,6 +120,7 @@ public class Report {
         this.totalTests = total;
     }
 
+    @SuppressWarnings({"DefaultCharset", "CatchAndPrintStackTrace"})
     private void writeCSV(String fileName){
         try {
             PrintWriter writer = new PrintWriter(new File(fileName));
