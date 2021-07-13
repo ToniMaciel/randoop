@@ -141,7 +141,6 @@ public class SpecialCoveredClassTest {
     Report report = new Report();
     List<ExecutableSequence> allSequences = rTests;
     allSequences.addAll(testGenerator.getErrorTestSequences());
-    report.setTotalTests(allSequences.size());
     report.generateReport(allSequences);
 
     List<ExecutableSequence> eTests = testGenerator.getErrorTestSequences();

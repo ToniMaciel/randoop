@@ -540,7 +540,6 @@ public class GenTests extends GenInputsAbstract {
     Report report = new Report();
     List<ExecutableSequence> allSequences = explorer.getRegressionSequences();
     allSequences.addAll(explorer.getErrorTestSequences());
-    report.setTotalTests(allSequences.size());
     report.generateReport(allSequences);
 
     if (!GenInputsAbstract.no_error_revealing_tests) {
