@@ -70,9 +70,10 @@ public class TypedOperationSelectorBasedOnTargetInputClasses {
     }
 
     public TypedOperation selectTargetMethodOperation(TypedOperationSelector operationSelector){
-        if (this.mandatoryTypedOperations.size() > 0)
-            return this.mandatoryTypedOperations.get(new Random().nextInt(this.mandatoryTypedOperations.size()));
-        else{
+        if (this.mandatoryTypedOperations.size() > 0) {
+            return this.mandatoryTypedOperations
+                .get(new Random().nextInt(this.mandatoryTypedOperations.size()));
+        }else{
             return operationSelector.selectOperation();
         }
     }

@@ -51,7 +51,8 @@ public class ForwardGenerator extends AbstractGenerator {
    * discarded.
    *
    * <p>This must be ordered by insertion to allow for flaky test history collection in {@link
-   * randoop.main.GenTests#printSequenceExceptionError(AbstractGenerator, SequenceExceptionError)}.
+   * randoop.main.GenTests#
+   * printSequenceExceptionError(AbstractGenerator, SequenceExceptionError)}.
    */
   private final LinkedHashSet<Sequence> allSequences = new LinkedHashSet<>();
 
@@ -605,10 +606,10 @@ public class ForwardGenerator extends AbstractGenerator {
     // same thing every time it is invoked. Since we have just invoked it, its result will be in the
     // pool.
     // There is no need to call this operation again, so remove it from the list of operations.
-    if (operation.getInputTypes().isEmpty()) {
+    /*if (operation.getInputTypes().isEmpty()) {
       operationHistory.add(operation, OperationOutcome.REMOVED);
       operations.remove(operation);
-    }
+    }*/
 
     // Discard if sequence is larger than size limit
     if (newSequence.size() > GenInputsAbstract.maxsize) {
