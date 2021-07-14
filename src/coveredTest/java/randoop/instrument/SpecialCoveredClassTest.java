@@ -139,7 +139,9 @@ public class SpecialCoveredClassTest {
     assertFalse(rTests.isEmpty());
 
     Report report = new Report();
-    report.generateReport(rTests);
+    List<ExecutableSequence> allSequences = rTests;
+    allSequences.addAll(testGenerator.getErrorTestSequences());
+    report.generateReport(allSequences);
 
     List<ExecutableSequence> eTests = testGenerator.getErrorTestSequences();
     CoveredClassTest.assertNoTests(eTests, "error");
