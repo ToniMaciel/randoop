@@ -41,8 +41,8 @@ public class Report {
      * Iterate over all ExecutableSequence in the given list, in each of this ExecutableSequence, will iterate over their sequences. 
      * Then, will get the operation of the sequence and if it doesn't an non-receiving type, increments the number of times that this 
      * operations is called along the tests. For the last, will analyses the runtimeValue of the execution of this sequence, and then, 
-     * if does't null, the number of times that objects of the class of the  sequence's outcome are created will be incremented and it 
-     * will be verified if there is an object with the same values of the oucome in previous tests execution's and, depending on the result,
+     * if doesn't null, the number of times that objects of the class of the  sequence's outcome are created will be incremented and it
+     * will be verified if there is an object with the same values of the outcome in previous tests execution's and, depending on the result,
      * the analysis of single objects will also be increased.
      * 
      * Observation: This method is called in gentest's class. For now, it only generates reports of regression tests. 
@@ -83,7 +83,7 @@ public class Report {
     private boolean IsUniqueObject(Object outcome)  {
         for (Object uniqueObject : uniqueObjects){
             if (outcome.getClass().equals(uniqueObject.getClass())) {
-                if(EqualsBuilder.reflectionEquals(outcome, uniqueObject, true))
+                if(EqualsBuilder.reflectionEquals(outcome, uniqueObject, true, null, true))
                     return false;
             }
         }
@@ -108,8 +108,9 @@ public class Report {
 
     /** Generates two csv files: One with the report for methods called and other with the report for objects created in the tests.
      * 
-     * Observation: Those csvs will be in the directory where the randoop was executaded.
+     * Observation: Those csvs will be in the directory where the randoop was executed.
      */
+    
     private void generateCSV(){
         writeCSV("methods_report.csv");
         writeCSV("objects_report.csv");
