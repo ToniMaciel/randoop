@@ -83,7 +83,7 @@ public class Report {
     private boolean IsUniqueObject(Object outcome)  {
         for (Object uniqueObject : uniqueObjects){
             if (outcome.getClass().equals(uniqueObject.getClass())) {
-                if(EqualsBuilder.reflectionEquals(outcome, uniqueObject, true))
+                if(EqualsBuilder.reflectionEquals(outcome, uniqueObject, true, null, true))
                     return false;
             }
         }
